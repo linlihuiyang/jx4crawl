@@ -1,42 +1,41 @@
 package jx4crawl.browser;
 
-
 import com.teamdev.jxbrowser.chromium.Browser;
-import com.teamdev.jxbrowser.chromium.swing.BrowserView;
- 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import com.teamdev.jxbrowser.chromium.BrowserCore;
+import com.teamdev.jxbrowser.chromium.internal.Environment;
+import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
-public class JxBrowser {
 
-	public static void main(String[] args) {
-        final Browser browser = new Browser();
-        BrowserView view = new BrowserView(browser);
- 
-        final JTextField addressBar = new JTextField(
-                "http://www.teamdev.com/jxbrowser");
-        addressBar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                browser.loadURL(addressBar.getText());
-            }
-        });
- 
-        JPanel addressPane = new JPanel(new BorderLayout());
-        addressPane.add(new JLabel(" URL: "), BorderLayout.WEST);
-        addressPane.add(addressBar, BorderLayout.CENTER);
- 
-        JFrame frame = new JFrame("JxBrowser - Hello World");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.add(addressPane, BorderLayout.NORTH);
-        frame.add(view, BorderLayout.CENTER);
-        frame.setSize(800, 500);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
- 
-        browser.loadURL(addressBar.getText());
-    }
 
+public class JxBrowser extends Application{
+	 @Override
+	    public void init() throws Exception {
+	        // On Mac OS X Chromium engine must be initialized in non-UI thread.
+	        if (Environment.isMac()) {
+	            BrowserCore.initialize();
+	        }
+	    }
+
+	    @Override
+	    public void start(Stage primaryStage) {
+	        Browser browser = new Browser();
+	        BrowserView browserView = new BrowserView(browser);
+
+	        StackPane pane = new StackPane();
+	        pane.getChildren().add(browserView);
+	        Scene scene = new Scene(pane, 500, 400);
+	        primaryStage.setTitle("JxBrowser: JavaFX - Hello World");
+	        primaryStage.setScene(scene);
+	        primaryStage.show();
+
+	        browser.loadHTML("<html><body><h1>Hello World!</h1></body></html>");
+	    }
+
+	    public static void main(String[] args) {
+	        launch(args);
+	    }
 }
